@@ -40,19 +40,7 @@ const API = {
 };
 
 
-  async update(id, data) {
-    const tasks = await this.list();
-    const idx = tasks.findIndex(t => t.id === id);
-    if (idx !== -1) tasks[idx] = { ...tasks[idx], ...data };
-    localStorage.setItem(this.key, JSON.stringify(tasks));
-    return tasks[idx];
-  },
 
-  async remove(id) {
-    const tasks = await this.list();
-    localStorage.setItem(this.key, JSON.stringify(tasks.filter(t => t.id !== id)));
-  }
-};
 // ── State ─────────────────────────────────────
 const state = {
   tasks: [],
