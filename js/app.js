@@ -3,24 +3,42 @@
    전체 앱 로직: API 연동, 4개 뷰 렌더링, CRUD
    ============================================= */
 
-'use strict';
 
 // ── API ──────────────────────────────────────
+// Firebase 설정
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+import { getFirestore, collection, getDocs, addDoc, updateDoc, deleteDoc, doc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyBcB6nA_MgzY9qm4arRemE1VYm7duF22sM",
+  authDomain: "marketing-timeplan.firebaseapp.com",
+  projectId: "marketing-timeplan",
+  storageBucket: "marketing-timeplan.firebasestorage.app",
+  messagingSenderId: "921792695498",
+  appId: "1:921792695498:web:1d4ea163d100a4e2bb3833"
+};
+
+const firebaseApp = initializeApp(firebaseConfig);
+const db = getFirestore(firebaseApp);
+
 const API = {
-  key: 'marketing_tasks',
-
   async list() {
-    const data = localStorage.getItem(this.key);
-    return data ? JSON.parse(data) : [];
+    const snapshot = await getDocs(collection(db, 'tasks'));
+    return snapshot.docs.map(d => ({ id: d.id, ...d.data() }));
   },
-
   async create(data) {
-    const tasks = await this.list();
-    const newTask = { ...data, id: 'task_' + Date.now() };
-    tasks.push(newTask);
-    localStorage.setItem(this.key, JSON.stringify(tasks));
-    return newTask;
+    const ref = await addDoc(collection(db, 'tasks'), data);
+    return { id: ref.id, ...data };
   },
+  async update(id, data) {
+    await updateDoc(doc(db, 'tasks', id), data);
+    return { id, ...data };
+  },
+  async remove(id) {
+    await deleteDoc(doc(db, 'tasks', id));
+  }
+};
+
 
   async update(id, data) {
     const tasks = await this.list();
